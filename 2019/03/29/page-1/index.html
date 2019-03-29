@@ -18,16 +18,12 @@
   <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
   
-    css('css/plugins/gitment.css')
-  
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/geopattern/1.2.3/js/geopattern.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
   
     <script src="/js/qrious.js"></script>
   
-  
-    <script src="/js/gitment.js"></script>
   
   
   
@@ -202,11 +198,7 @@
     
     <!-- 二维码 END -->
     
-      <!-- Gitment START -->
-      <div id="comments"></div>
-      <link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
-      <script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
-      <!-- Gitment END -->
+      <!-- No Comment -->
     
   </article>
   <!-- Article END -->
@@ -283,34 +275,6 @@
   </script>
 
 
-
-  <script>
-    var gitmentConfig = "dyhzwei";
-    if (gitmentConfig !== 'undefined') {
-      var gitment = new Gitment({
-        id: "page-1",
-        owner: "dyhzwei",
-        repo: "https://github.com/dyhzwei/dyhzwei.github.io",
-        oauth: {
-          client_id: "22bed2335157746fda66",
-          client_secret: "970cc0394f7efc64f8f6d11d306ee42569b24e87"
-        },
-        theme: {
-          render(state, instance) {
-            const container = document.createElement('div')
-            container.lang = "en-US"
-            container.className = 'gitment-container gitment-root-container'
-            container.appendChild(instance.renderHeader(state, instance))
-            container.appendChild(instance.renderEditor(state, instance))
-            container.appendChild(instance.renderComments(state, instance))
-            container.appendChild(instance.renderFooter(state, instance))
-            return container;
-          }
-        }
-      })
-      gitment.render(document.getElementById('comments'))
-    }
-  </script>
 
 
 

@@ -10,7 +10,7 @@
   
   <title>
     
-      笛佛笔试 | Hexo
+      java-垃圾回收 | Hexo
     
   </title>
   <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -140,7 +140,7 @@
 </header>
 
     <div id="article-banner">
-  <h2>笛佛笔试</h2>
+  <h2>java-垃圾回收</h2>
   <p class="post-date">2019-03-31</p>
   <div class="arrow-down">
     <a href="javascript:;"></a>
@@ -149,40 +149,51 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><ul>
-<li><h4 id="运算符优先级"><a href="#运算符优先级" class="headerlink" title="运算符优先级"></a>运算符优先级</h4></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;a&quot;+&apos;a&apos;+1</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aa1</span><br></pre></td></tr></table></figure>
-<ul>
-<li><h4 id="字符串比较"><a href="#字符串比较" class="headerlink" title="字符串比较"></a>字符串比较</h4></li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String str1 = <span class="string">"abcd"</span>;</span><br><span class="line">String str2 = <span class="keyword">new</span> String(<span class="string">"abcd"</span>);</span><br><span class="line">String str3 = <span class="string">"ab"</span> + <span class="keyword">new</span> String(<span class="string">"cd"</span>);</span><br><span class="line"></span><br><span class="line">System.out.println(str1 == str2);</span><br><span class="line">System.out.println(str1 == str3);</span><br><span class="line">System.out.println(str2 == str3);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>结果：</p>
-<p>false<br>false<br>false</p>
+    <section class="markdown-content"><h4 id="gc主要目标区域"><a href="#gc主要目标区域" class="headerlink" title="gc主要目标区域"></a>gc主要目标区域</h4><blockquote>
+<p>java堆</p>
 </blockquote>
-<ul>
-<li><h4 id="手写工厂模式"><a href="#手写工厂模式" class="headerlink" title="手写工厂模式"></a>手写工厂模式</h4></li>
-<li><h4 id="int数组排序"><a href="#int数组排序" class="headerlink" title="int数组排序"></a>int数组排序</h4></li>
+<h4 id="判断垃圾的标准"><a href="#判断垃圾的标准" class="headerlink" title="判断垃圾的标准"></a>判断垃圾的标准</h4><ul>
+<li>引用计数法</li>
+<li>可达性分析</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>[] a=&#123;<span class="number">1</span>,<span class="number">4</span>,-<span class="number">1</span>,<span class="number">5</span>,<span class="number">0</span>&#125;;</span><br><span class="line">Arrays.sort(a);</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>扩展，数组转List（只对非基本类型有效）。基本类型会把元数组整体作为一个元素扔进去。</p>
+<h5 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h5><ul>
+<li><p>对象的引用计数器：被引用-&gt;+1 ; 完成引用-&gt;-1 (方法运行结束后，局部变量引用会自动释放)</p>
+</li>
+<li><p>为0就当做垃圾</p>
+</li>
+<li><p>优点：效率高，很少打断程序执行</p>
+</li>
+<li><p>缺点：若循环引用，则无法回收，内存泄漏。看下例。</p>
+</li>
+</ul>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String[] s = &#123;<span class="string">"aa"</span>,<span class="string">"bb"</span>,<span class="string">"cc"</span>&#125;;</span><br><span class="line">List&lt;String&gt; strlist = Arrays.asList(s);</span><br><span class="line"><span class="keyword">for</span>(String str:strlist)&#123;</span><br><span class="line">    System.out.println(str);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> </span>&#123;</span><br><span class="line"> <span class="keyword">public</span> MyClass refObj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MyClass myClass_A = <span class="keyword">new</span> MyClass();</span><br><span class="line">MyClass myClass_B = <span class="keyword">new</span> MyClass();</span><br><span class="line"></span><br><span class="line">myClass_A.refObj = myClass_B;</span><br><span class="line">myClass_B.refObj = myClass_A;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<h5 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h5><ul>
+<li><p>从GCroot 是否有一条路径能到达对象</p>
+<p><img src alt="/images/可达性分析-1.png"></p>
+</li>
+<li><p>GCroot对象：  </p>
+<ul>
+<li>虚拟机栈中的引用对象</li>
+<li>方法区中的常量中的引用对象</li>
+<li>方法区中的类静态变量中的引用对象 </li>
+<li>本地方法栈中的JNI（Native方法）的引用对象</li>
+<li>活跃线程的引用对象</li>
+</ul>
+</li>
+</ul>
+</blockquote>
 </section>
     <!-- Tags START -->
     
       <div class="tags">
         <span>Tags:</span>
         
-  <a href="/tags#笔试">
-    <span class="tag-code">笔试</span>
-  </a>
-
-  <a href="/tags#情报">
-    <span class="tag-code">情报</span>
+  <a href="/tags#java-概念">
+    <span class="tag-code">java-概念</span>
   </a>
 
       </div>
@@ -193,20 +204,13 @@
   <div class="nav-container">
     <!-- reverse left and right to put prev and next in a more logic postition -->
     
-      <a class="nav-left" href="/2019/03/31/爱的战士/">
+      <a class="nav-left" href="/2019/03/31/笛佛笔试/">
         <span class="nav-arrow">← </span>
         
-          爱的战士
+          笛佛笔试
         
       </a>
     
-    
-      <a class="nav-right" href="/2019/03/31/java-垃圾回收/">
-        
-          java-垃圾回收
-        
-        <span class="nav-arrow"> →</span>
-      </a>
     
   </div>
 
@@ -250,7 +254,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#运算符优先级"><span class="toc-nav-text">运算符优先级</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#字符串比较"><span class="toc-nav-text">字符串比较</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#手写工厂模式"><span class="toc-nav-text">手写工厂模式</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#int数组排序"><span class="toc-nav-text">int数组排序</span></a></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#gc主要目标区域"><span class="toc-nav-text">gc主要目标区域</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#判断垃圾的标准"><span class="toc-nav-text">判断垃圾的标准</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#引用计数法"><span class="toc-nav-text">引用计数法</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#可达性分析"><span class="toc-nav-text">可达性分析</span></a></li></ol></li></ol>
     
   </div>
 </aside>
@@ -260,7 +264,7 @@
 
 <script>
   (function () {
-    var url = 'https://dyhzwei.github.io/2019/03/31/笛佛笔试/';
+    var url = 'https://dyhzwei.github.io/2019/03/31/java-垃圾回收/';
     var banner = ''
     if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
       $('#article-banner').css({

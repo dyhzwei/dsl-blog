@@ -237,6 +237,11 @@
 <li>循环跳转</li>
 <li>异常跳转</li>
 </ol>
+<h2 id="吞吐量"><a href="#吞吐量" class="headerlink" title="吞吐量"></a>吞吐量</h2><p>概念：运行用户代码时间/(运行用户代码时间+GC时间)</p>
+<blockquote>
+<p>抉择</p>
+<p>缩短用户停顿时间 or 增大吞吐量</p>
+</blockquote>
 <h2 id="java虚拟机启动模式"><a href="#java虚拟机启动模式" class="headerlink" title="java虚拟机启动模式"></a>java虚拟机启动模式</h2><ol>
 <li>server</li>
 <li>client<br>命令-查看：java -version<br>命令-切换：</li>
@@ -254,8 +259,34 @@
 <p>JVM client模式下的默认年轻代收集器</p>
 <p>-XX:UseSerialGC</p>
 </blockquote>
-<h3 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h3><p><code>老年代收集器</code></p>
+<h3 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h3><p><code>年轻代收集器</code></p>
 <p>策略：复制</p>
+<p>特点：</p>
+<ol>
+<li>多线程收集</li>
+<li>其它行为和Serial收集器一样</li>
+</ol>
+<blockquote>
+<p>~</p>
+<p>多核才有利</p>
+<p>默认并发数=核数</p>
+<p>-XX:UseParNewGC</p>
+</blockquote>
+<h3 id="Parallel-Scavenge收集器"><a href="#Parallel-Scavenge收集器" class="headerlink" title="Parallel Scavenge收集器"></a>Parallel Scavenge收集器</h3><p><code>年轻代收集器</code></p>
+<p>策略：复制</p>
+<p>特点：</p>
+<ol>
+<li>高吞吐量</li>
+<li>多线程</li>
+</ol>
+<blockquote>
+<p>~</p>
+<p>JVM Server模式下默认的年轻代收集器</p>
+<p>默认并发数=核数</p>
+<p>-XX:UseParallerGC<br>-XX:UseAdaptiveSizepolicy 调优任务交给jvm去完成</p>
+</blockquote>
+<h3 id="Serial-Old收集器"><a href="#Serial-Old收集器" class="headerlink" title="Serial Old收集器"></a>Serial Old收集器</h3><p><code>老年代收集器</code></p>
+<p>策略：标记整理</p>
 <p>特点：</p>
 <ol>
 <li>单线程收集，收集时，必须暂停所有工作线程</li>
@@ -264,8 +295,46 @@
 <blockquote>
 <p>~</p>
 <p>JVM client模式下的默认年轻代收集器</p>
-<p>-XX:UseSerialGC</p>
+<p>-XX:UseSerialOldGC</p>
 </blockquote>
+<h3 id="Parallel-Old收集器"><a href="#Parallel-Old收集器" class="headerlink" title="Parallel Old收集器"></a>Parallel Old收集器</h3><p><code>老年代收集器</code></p>
+<p>策略：标记整理</p>
+<p>特点：</p>
+<ol>
+<li>多线程</li>
+<li>吞吐量优先</li>
+</ol>
+<blockquote>
+<p>~</p>
+<p>-XX:UseParallelOldGC</p>
+</blockquote>
+<h3 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h3><p><code>老年代收集器</code></p>
+<p>策略：标记清除</p>
+<p>步骤：</p>
+<ol>
+<li>初始标记， stw 找到所有和GCroot直接关联的对象</li>
+<li>并发标记，并发执行追踪step1所有对象的关联对象</li>
+<li>并发预清理，并发寻找晋升对象</li>
+<li>重新标记，暂停虚拟机，扫描CMS堆剩余对象</li>
+<li>并发清理</li>
+<li>并发重置</li>
+</ol>
+<blockquote>
+<p>step1 和 step4 会暂停</p>
+<p>-xx：UseConcMarkSweepGC</p>
+</blockquote>
+<h3 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h3><p><code>年轻代 老年代收集器</code></p>
+<p>策略：复制 标记整理</p>
+<p>特点：</p>
+<ol>
+<li>并行和并发</li>
+<li>分代收集</li>
+<li>无内存碎片</li>
+<li>可预测的停顿</li>
+<li>将整个java堆内存分成多个大小相等的Region进行管理</li>
+<li>年轻代和老年代不再物理隔离</li>
+</ol>
+<p><img src="/images/G1.png" alt></p>
 </section>
     <!-- Tags START -->
     
@@ -334,7 +403,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#gc主要目标区域"><span class="toc-nav-text">gc主要目标区域</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#判断垃圾的标准"><span class="toc-nav-text">判断垃圾的标准</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#引用计数法"><span class="toc-nav-text">引用计数法</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#可达性分析"><span class="toc-nav-text">可达性分析</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收算法"><span class="toc-nav-text">垃圾回收算法</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记清除（Mark-and-Sweep）"><span class="toc-nav-text">标记清除（Mark and Sweep）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制（Copying）"><span class="toc-nav-text">复制（Copying）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记整理（-Compacting）"><span class="toc-nav-text">标记整理（ Compacting）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分代回收（Generational-Collection）"><span class="toc-nav-text">分代回收（Generational Collection）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#年轻代MinorGC"><span class="toc-nav-text">年轻代MinorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#老年代MajorGC"><span class="toc-nav-text">老年代MajorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FullGC"><span class="toc-nav-text">FullGC</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Stop-the-World"><span class="toc-nav-text">Stop-the-World</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#SafePoint"><span class="toc-nav-text">SafePoint</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#java虚拟机启动模式"><span class="toc-nav-text">java虚拟机启动模式</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收器搭配图"><span class="toc-nav-text">垃圾回收器搭配图</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Serial收集器"><span class="toc-nav-text">Serial收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#ParNew收集器"><span class="toc-nav-text">ParNew收集器</span></a></li></ol></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#gc主要目标区域"><span class="toc-nav-text">gc主要目标区域</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#判断垃圾的标准"><span class="toc-nav-text">判断垃圾的标准</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#引用计数法"><span class="toc-nav-text">引用计数法</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#可达性分析"><span class="toc-nav-text">可达性分析</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收算法"><span class="toc-nav-text">垃圾回收算法</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记清除（Mark-and-Sweep）"><span class="toc-nav-text">标记清除（Mark and Sweep）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制（Copying）"><span class="toc-nav-text">复制（Copying）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记整理（-Compacting）"><span class="toc-nav-text">标记整理（ Compacting）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分代回收（Generational-Collection）"><span class="toc-nav-text">分代回收（Generational Collection）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#年轻代MinorGC"><span class="toc-nav-text">年轻代MinorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#老年代MajorGC"><span class="toc-nav-text">老年代MajorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FullGC"><span class="toc-nav-text">FullGC</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Stop-the-World"><span class="toc-nav-text">Stop-the-World</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#SafePoint"><span class="toc-nav-text">SafePoint</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#吞吐量"><span class="toc-nav-text">吞吐量</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#java虚拟机启动模式"><span class="toc-nav-text">java虚拟机启动模式</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收器搭配图"><span class="toc-nav-text">垃圾回收器搭配图</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Serial收集器"><span class="toc-nav-text">Serial收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#ParNew收集器"><span class="toc-nav-text">ParNew收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Parallel-Scavenge收集器"><span class="toc-nav-text">Parallel Scavenge收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Serial-Old收集器"><span class="toc-nav-text">Serial Old收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Parallel-Old收集器"><span class="toc-nav-text">Parallel Old收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#CMS收集器"><span class="toc-nav-text">CMS收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#G1收集器"><span class="toc-nav-text">G1收集器</span></a></li></ol></li></ol>
     
   </div>
 </aside>

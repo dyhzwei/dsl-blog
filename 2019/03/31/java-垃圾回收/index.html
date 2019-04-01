@@ -149,42 +149,122 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><h4 id="gc主要目标区域"><a href="#gc主要目标区域" class="headerlink" title="gc主要目标区域"></a>gc主要目标区域</h4><blockquote>
-<p>java堆</p>
-</blockquote>
-<h4 id="判断垃圾的标准"><a href="#判断垃圾的标准" class="headerlink" title="判断垃圾的标准"></a>判断垃圾的标准</h4><ul>
+    <section class="markdown-content"><h2 id="gc主要目标区域"><a href="#gc主要目标区域" class="headerlink" title="gc主要目标区域"></a>gc主要目标区域</h2><p>java堆</p>
+<h2 id="判断垃圾的标准"><a href="#判断垃圾的标准" class="headerlink" title="判断垃圾的标准"></a>判断垃圾的标准</h2><ul>
 <li>引用计数法</li>
 <li>可达性分析</li>
 </ul>
-<blockquote>
-<h5 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h5><ul>
-<li><p>对象的引用计数器：被引用-&gt;+1 ; 完成引用-&gt;-1 (方法运行结束后，局部变量引用会自动释放)</p>
-</li>
-<li><p>为0就当做垃圾</p>
-</li>
-<li><p>优点：效率高，很少打断程序执行</p>
-</li>
-<li><p>缺点：若循环引用，则无法回收，内存泄漏。看下例。</p>
-</li>
-</ul>
-</blockquote>
+<h3 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h3><p>思路：对象的引用计数器：被引用-&gt;+1 ; 完成引用-&gt;-1 (方法运行结束后，局部变量引用会自动释放 为0就当做垃圾</p>
+<p>优点：效率高，很少打断程序执行</p>
+<p>缺点：若循环引用，则无法回收，内存泄漏。看下例。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClass</span> </span>&#123;</span><br><span class="line"> <span class="keyword">public</span> MyClass refObj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">MyClass myClass_A = <span class="keyword">new</span> MyClass();</span><br><span class="line">MyClass myClass_B = <span class="keyword">new</span> MyClass();</span><br><span class="line"></span><br><span class="line">myClass_A.refObj = myClass_B;</span><br><span class="line">myClass_B.refObj = myClass_A;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<h5 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h5><ul>
-<li><p>从GCroot 是否有一条路径能到达对象</p>
+<h3 id="可达性分析"><a href="#可达性分析" class="headerlink" title="可达性分析"></a>可达性分析</h3><p>思路： 从GCroot 是否有一条路径能到达对象</p>
 <p><img src="/images/kdxfx-1.png" alt></p>
-</li>
-<li><p>GCroot对象：  </p>
+<blockquote>
 <ul>
+<li>GCroot对象：  <ol>
 <li>虚拟机栈中的引用对象</li>
 <li>方法区中的常量中的引用对象</li>
 <li>方法区中的类静态变量中的引用对象 </li>
 <li>本地方法栈中的JNI（Native方法）的引用对象</li>
 <li>活跃线程的引用对象</li>
-</ul>
+</ol>
 </li>
 </ul>
+</blockquote>
+<h2 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h2><h3 id="标记清除（Mark-and-Sweep）"><a href="#标记清除（Mark-and-Sweep）" class="headerlink" title="标记清除（Mark and Sweep）"></a>标记清除（Mark and Sweep）</h3><p>缺点：会产生碎片</p>
+<p><img src="/images/mark-and-sweep.png" alt></p>
+<h3 id="复制（Copying）"><a href="#复制（Copying）" class="headerlink" title="复制（Copying）"></a>复制（Copying）</h3><p>思路：分为两个区域，一个用于分配，一个用于接纳复制的存活对象。随后角色调换<br>特点：</p>
+<ol>
+<li>不会产生碎片</li>
+<li>顺序分配内存，简短高效</li>
+<li>内存使用率低</li>
+<li>相性：对象存活率低~年轻代</li>
+</ol>
+<p><img src="/images/Copying.png" alt></p>
+<h3 id="标记整理（-Compacting）"><a href="#标记整理（-Compacting）" class="headerlink" title="标记整理（ Compacting）"></a>标记整理（ Compacting）</h3><p> 思路： 存活对象向前紧凑，按内存地址排序，末端地址后的全部回收<br> 特点：</p>
+<ol>
+<li>无内存碎片</li>
+<li>相性：存活率高~老年代</li>
+</ol>
+<h3 id="分代回收（Generational-Collection）"><a href="#分代回收（Generational-Collection）" class="headerlink" title="分代回收（Generational Collection）"></a>分代回收（Generational Collection）</h3><p>思路：混合型算法，寿命不同采用不同策略<br>MinorGC + MajorGC = FullGC<br>年轻-&gt;MinorGC ; 老年-&gt;MajorGC+MinorGC</p>
+<p>发展：<br>JDK1.6、1.7 年轻，老年，永久<br>JDK1.8 及以上 年轻，老年</p>
+<p><img src="/images/分代回收.png" alt></p>
+<h4 id="年轻代MinorGC"><a href="#年轻代MinorGC" class="headerlink" title="年轻代MinorGC"></a>年轻代MinorGC</h4><p><code>复制法</code></p>
+<ol>
+<li><p>首次Eden复制到from；后续是Eden+from 复制到 to 区</p>
+</li>
+<li><p>回收，存活对象年龄+1 若超过15则进入老年代</p>
+</li>
+<li><p>from 和 to对调</p>
+</li>
+</ol>
+<blockquote>
+<p>总结·混入老年代方法</p>
+<ol>
+<li>存活次数（年龄）超过阈值</li>
+<li>复制时Survivor区放不下</li>
+<li>新生成的大对象size超阈值</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>调优参数<br>Eden和Survivor的比值，默认8:1=&gt; -XX:SurvivorRation:<br>老年代年轻代大小比例 =&gt; -XX:NewRatio:<br>设置升级年龄阈值=&gt; -XX:MaxTenuringThreshold:<br>大对象size阈值=&gt; -XX:PretenuerSizeThreshold:</p>
+</blockquote>
+<h4 id="老年代MajorGC"><a href="#老年代MajorGC" class="headerlink" title="老年代MajorGC"></a>老年代MajorGC</h4><p>策略：<code>标记-清理</code>  <code>标记-清理</code></p>
+<p> 一般进行老年代GC的时候都是因为先前的年轻代GC，整体成为FullGC</p>
+<h4 id="FullGC"><a href="#FullGC" class="headerlink" title="FullGC"></a>FullGC</h4><p>触发条件：</p>
+<ol>
+<li>老年代空间不足</li>
+<li>JDK1.6 1.7 永久代空间不足~所以1.8减少了GC频率</li>
+<li>年轻代晋升的平均size大于剩余空间 （根据平均size估计，新分配可能不够）</li>
+<li>程序员调用 System.gc()</li>
+<li>用RMI 进行RPC或管理的JDK应用，每1h执行一次FullGC</li>
+</ol>
+<blockquote>
+<p>~CMS 回收器</p>
+<p>promotion failed</p>
+<p>concurrent mode failure</p>
+</blockquote>
+<h2 id="Stop-the-World"><a href="#Stop-the-World" class="headerlink" title="Stop-the-World"></a>Stop-the-World</h2><p>概念：JVM为了执行GC而停止执行应用程序</p>
+<p>特点：任何一种GC都会发生</p>
+<blockquote>
+<p>优化主要就是指减少stw的时间</p>
+</blockquote>
+<h2 id="SafePoint"><a href="#SafePoint" class="headerlink" title="SafePoint"></a>SafePoint</h2><p>概念：对象引用关系不发生改变的点<br>出现：</p>
+<ol>
+<li>方法调用</li>
+<li>循环跳转</li>
+<li>异常跳转</li>
+</ol>
+<h2 id="java虚拟机启动模式"><a href="#java虚拟机启动模式" class="headerlink" title="java虚拟机启动模式"></a>java虚拟机启动模式</h2><ol>
+<li>server</li>
+<li>client<br>命令-查看：java -version<br>命令-切换：</li>
+</ol>
+<h2 id="垃圾回收器搭配图"><a href="#垃圾回收器搭配图" class="headerlink" title="垃圾回收器搭配图"></a>垃圾回收器搭配图</h2><p><img src="/images/收集器组合.png" alt></p>
+<h3 id="Serial收集器"><a href="#Serial收集器" class="headerlink" title="Serial收集器"></a>Serial收集器</h3><p><code>年轻代收集器</code></p>
+<p>策略：复制</p>
+<p>特点：</p>
+<ol>
+<li>单线程收集，收集时，必须暂停所有工作线程</li>
+<li>简单高效</li>
+</ol>
+<blockquote>
+<p>~</p>
+<p>JVM client模式下的默认年轻代收集器</p>
+<p>-XX:UseSerialGC</p>
+</blockquote>
+<h3 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h3><p><code>老年代收集器</code></p>
+<p>策略：复制</p>
+<p>特点：</p>
+<ol>
+<li>单线程收集，收集时，必须暂停所有工作线程</li>
+<li>简单高效</li>
+</ol>
+<blockquote>
+<p>~</p>
+<p>JVM client模式下的默认年轻代收集器</p>
+<p>-XX:UseSerialGC</p>
 </blockquote>
 </section>
     <!-- Tags START -->
@@ -254,7 +334,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#gc主要目标区域"><span class="toc-nav-text">gc主要目标区域</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#判断垃圾的标准"><span class="toc-nav-text">判断垃圾的标准</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#引用计数法"><span class="toc-nav-text">引用计数法</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#可达性分析"><span class="toc-nav-text">可达性分析</span></a></li></ol></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#gc主要目标区域"><span class="toc-nav-text">gc主要目标区域</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#判断垃圾的标准"><span class="toc-nav-text">判断垃圾的标准</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#引用计数法"><span class="toc-nav-text">引用计数法</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#可达性分析"><span class="toc-nav-text">可达性分析</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收算法"><span class="toc-nav-text">垃圾回收算法</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记清除（Mark-and-Sweep）"><span class="toc-nav-text">标记清除（Mark and Sweep）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#复制（Copying）"><span class="toc-nav-text">复制（Copying）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#标记整理（-Compacting）"><span class="toc-nav-text">标记整理（ Compacting）</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分代回收（Generational-Collection）"><span class="toc-nav-text">分代回收（Generational Collection）</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#年轻代MinorGC"><span class="toc-nav-text">年轻代MinorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#老年代MajorGC"><span class="toc-nav-text">老年代MajorGC</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FullGC"><span class="toc-nav-text">FullGC</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Stop-the-World"><span class="toc-nav-text">Stop-the-World</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#SafePoint"><span class="toc-nav-text">SafePoint</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#java虚拟机启动模式"><span class="toc-nav-text">java虚拟机启动模式</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#垃圾回收器搭配图"><span class="toc-nav-text">垃圾回收器搭配图</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Serial收集器"><span class="toc-nav-text">Serial收集器</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#ParNew收集器"><span class="toc-nav-text">ParNew收集器</span></a></li></ol></li></ol>
     
   </div>
 </aside>

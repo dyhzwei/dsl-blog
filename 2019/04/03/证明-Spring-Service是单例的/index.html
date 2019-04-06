@@ -10,7 +10,7 @@
   
   <title>
     
-      maven配置注意点 | Hexo
+      证明-Spring Service是单例的 | Hexo
     
   </title>
   <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -140,7 +140,7 @@
 </header>
 
     <div id="article-banner">
-  <h2>maven配置注意点</h2>
+  <h2>证明-Spring Service是单例的</h2>
   <p class="post-date">2019-04-03</p>
   <div class="arrow-down">
     <a href="javascript:;"></a>
@@ -149,14 +149,17 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol>
-<li>下载并解压</li>
-<li>环境变量</li>
-<li><code>/conf/setting.xml</code> 配置国内镜像</li>
-<li>idea配置maven路径</li>
-</ol>
+    <section class="markdown-content"><blockquote>
+<p>service</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SingletonService</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>若不进行3和4可能会特别慢</p>
+<p>SingletonServiceImpl</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SingletonServiceImpl</span> <span class="keyword">implements</span> <span class="title">SingletonService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> count = <span class="number">0</span>;<span class="comment">//用于计数</span></span><br><span class="line">    <span class="comment">/*构造函数 若非单例则count会一直 +1*/</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SingletonServiceImpl</span><span class="params">()</span></span>&#123;</span><br><span class="line">        count++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="keyword">this</span>);</span><br><span class="line">        System.out.println(count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结果：</p>
+<p>com.dsl.rec.serviceImpl.SingletonServiceImpl@3757a0e0<br>1<br>com.dsl.rec.serviceImpl.SingletonServiceImpl@3757a0e0<br>1</p>
 </blockquote>
 </section>
     <!-- Tags START -->
@@ -164,12 +167,12 @@
       <div class="tags">
         <span>Tags:</span>
         
-  <a href="/tags#配置">
-    <span class="tag-code">配置</span>
+  <a href="/tags#证明">
+    <span class="tag-code">证明</span>
   </a>
 
-  <a href="/tags#maven">
-    <span class="tag-code">maven</span>
+  <a href="/tags#spring">
+    <span class="tag-code">spring</span>
   </a>
 
       </div>
@@ -180,17 +183,17 @@
   <div class="nav-container">
     <!-- reverse left and right to put prev and next in a more logic postition -->
     
-      <a class="nav-left" href="/2019/04/02/java-多线程/">
+      <a class="nav-left" href="/2019/04/03/maven配置注意点/">
         <span class="nav-arrow">← </span>
         
-          java-多线程
+          maven配置注意点
         
       </a>
     
     
-      <a class="nav-right" href="/2019/04/03/证明-Spring-Service是单例的/">
+      <a class="nav-right" href="/2019/04/06/读书笔记-Mahout实战/">
         
-          证明-Spring Service是单例的
+          读书笔记-Mahout实战
         
         <span class="nav-arrow"> →</span>
       </a>
@@ -237,7 +240,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#步骤"><span class="toc-nav-text">步骤</span></a></li></ol>
+      <ol class="nav">none</ol>
     
   </div>
 </aside>
@@ -247,7 +250,7 @@
 
 <script>
   (function () {
-    var url = 'https://dyhzwei.github.io/2019/04/03/maven配置注意点/';
+    var url = 'https://dyhzwei.github.io/2019/04/03/证明-Spring-Service是单例的/';
     var banner = ''
     if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
       $('#article-banner').css({

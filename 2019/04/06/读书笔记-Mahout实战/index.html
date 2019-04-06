@@ -151,21 +151,21 @@
   <article class="post-article">
     <section class="markdown-content"><p>##HelloWorldDemo</p>
 <p>依赖关系图</p>
-<p><img src="/images/images/读书笔记-mahout/mahout-hellodemo依赖.png" alt></p>
+<p><img src="/images/读书笔记-mahout/mahout-hellodemo依赖.png" alt></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">File f = <span class="keyword">new</span> File(dataPath + <span class="string">"xxx.csv"</span>);</span><br><span class="line">DataModel dm = <span class="keyword">new</span> FileDataModel(f);</span><br><span class="line">UserSimilarity similarity = <span class="keyword">new</span> PearsonCorrelationSimilarity(dm);</span><br><span class="line">UserNeighborhood neighborhood = <span class="keyword">new</span> NearestNUserNeighborhood(<span class="number">2</span>,similarity,dm);</span><br><span class="line">Recommender recommender = <span class="keyword">new</span> GenericUserBasedRecommender(dm,neighborhood,similarity);</span><br><span class="line">List&lt;RecommendedItem&gt; recommendedItemList = recommender.recommend(<span class="number">1</span>,<span class="number">2</span>);<span class="comment">//给userId为1的用户生成size为2的推荐列表</span></span><br><span class="line"><span class="keyword">return</span>  recommendedItemList;</span><br></pre></td></tr></table></figure>
-<p><img src="/images/images/读书笔记-mahout/官方组件关系.png" alt></p>
+<p><img src="/images/读书笔记-mahout/官方组件关系.png" alt></p>
 </section>
     <!-- Tags START -->
     
       <div class="tags">
         <span>Tags:</span>
         
-  <a href="/tags#读书笔记">
-    <span class="tag-code">读书笔记</span>
-  </a>
-
   <a href="/tags#java">
     <span class="tag-code">java</span>
+  </a>
+
+  <a href="/tags#读书笔记">
+    <span class="tag-code">读书笔记</span>
   </a>
 
   <a href="/tags#mahout">

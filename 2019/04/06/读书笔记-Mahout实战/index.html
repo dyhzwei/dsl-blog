@@ -163,11 +163,11 @@
 <blockquote>
 <p>注意：</p>
 <ol>
-<li><code>evaluator</code>在选择测试数据时会引入很多随机量，代码第一行的<code>RandomUtils.useTestSeed();</code> 保证了每次的随机值相同。被用于测试，不要在生产环境这样用。</li>
-<li><code>evaluate()</code>方法的第1个参数是 <code>RecommenderBuilder</code>，在此根据<code>builder</code>和分割比训练和评估算法。</li>
-<li><code>evaluate()</code>方法的第2个参数一般都传 <code>null</code> 特殊情况当要使用特殊的<code>DataModel</code>时，需要传入<code>DataModelBuilder</code>。</li>
-<li><code>evaluate()</code>方法的第4个参数  0.9表示 90%数据用于训练。</li>
-<li><code>evaluate()</code>方法的最后一个参数  1.0 代表使用全部数据，测试时若希望提高速度可以调小。</li>
+<li><code>evaluator</code> 在选择测试数据时会引入很多随机量，代码第一行的 <code>RandomUtils.useTestSeed();</code>  保证了每次的随机值相同。被用于测试，不要在生产环境这样用。</li>
+<li><code>evaluate()</code> 方法的第1个参数是 <code>RecommenderBuilder</code>，在此根据 <code>builder</code> 和分割比训练和评估算法。</li>
+<li><code>evaluate()</code> 方法的第2个参数一般都传  <code>null</code>  特殊情况当要使用特殊的 <code>DataModel</code> 时，需要传入<code>DataModelBuilder</code>。</li>
+<li><code>evaluate()</code> 方法的第4个参数  0.9表示 90%数据用于训练。</li>
+<li><code>evaluate()</code> 方法的最后一个参数  1.0 代表使用全部数据，测试时若希望提高速度可以调小。</li>
 </ol>
 </blockquote>
 <h4 id="评估误差方法表"><a href="#评估误差方法表" class="headerlink" title="评估误差方法表"></a>评估误差方法表</h4><table>
@@ -191,8 +191,8 @@
 <h3 id="评估查准率和查全率"><a href="#评估查准率和查全率" class="headerlink" title="评估查准率和查全率"></a>评估查准率和查全率</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">RandomUtils.useTestSeed();</span><br><span class="line">File file = <span class="keyword">new</span> File(<span class="string">"xxx.csv"</span>);</span><br><span class="line">DataModel dataModel = <span class="keyword">new</span> FileDataModel(file);</span><br><span class="line"></span><br><span class="line">RecommenderBuilder recommenderBuilder = <span class="keyword">new</span> RecommenderBuilder() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Recommender <span class="title">buildRecommender</span><span class="params">(DataModel dataModel)</span> <span class="keyword">throws</span> TasteException </span>&#123;</span><br><span class="line">        UserSimilarity similarity = <span class="keyword">new</span> PearsonCorrelationSimilarity(dataModel);</span><br><span class="line">        UserNeighborhood neighborhood = <span class="keyword">new</span> NearestNUserNeighborhood(<span class="number">2</span>,similarity,dataModel);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> GenericUserBasedRecommender(dataModel,neighborhood,similarity);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">RecommenderIRStatsEvaluator evaluator = <span class="keyword">new</span> GenericRecommenderIRStatsEvaluator();</span><br><span class="line">IRStatistics irStatistics = evaluator.evaluate(</span><br><span class="line">        recommenderBuilder,<span class="keyword">null</span>,dataModel,<span class="keyword">null</span>,</span><br><span class="line">        <span class="number">2</span>,GenericRecommenderIRStatsEvaluator.CHOOSE_THRESHOLD,<span class="number">1.0</span>);<span class="comment">//评估推荐两个item时的查准和查全</span></span><br><span class="line">System.out.println(irStatistics.getPrecision());<span class="comment">//查准率</span></span><br><span class="line">System.out.println(irStatistics.getRecall());<span class="comment">//查全率</span></span><br></pre></td></tr></table></figure>
 <blockquote>
 <p>注意:<br><code>Evaluator</code>的步骤是，执行推荐-&gt;评估推荐。</p>
-<p><code>查全查准评估器</code>在执行推荐的过程中会为每一个用户设定一个阈值。超过阈值才会为其推荐。<br>$$<br>阈值 = \mu + \sigma<br>$$<br>解释：比平均值高出了一定水准，”超过了一般的态度的喜欢”</p>
-<p><code>利用差值的评估器</code>是利用与测试集真值的差值进行评估，因此无须阈值。</p>
+<p>查全查准评估器在执行推荐的过程中会为每一个用户设定一个阈值。超过阈值才会为其推荐。<br>$$<br>阈值 = \mu + \sigma<br>$$<br>解释：比平均值高出了一定水准，”超过了一般的态度的喜欢”</p>
+<p>利用差值的评估器是利用与测试集真值的差值进行评估，因此无须阈值。</p>
 </blockquote>
 <blockquote>
 <p>~ 与别处的联系</p>

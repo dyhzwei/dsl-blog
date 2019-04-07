@@ -125,7 +125,7 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><h2 id="HelloWorldDemo"><a href="#HelloWorldDemo" class="headerlink" title="HelloWorldDemo"></a>HelloWorldDemo</h2><h3 id="生成推荐List"><a href="#生成推荐List" class="headerlink" title="生成推荐List"></a>生成推荐List</h3><blockquote>
+    <section class="markdown-content"><h1 id="第二章：入门"><a href="#第二章：入门" class="headerlink" title="第二章：入门"></a>第二章：入门</h1><h2 id="HelloWorldDemo"><a href="#HelloWorldDemo" class="headerlink" title="HelloWorldDemo"></a>HelloWorldDemo</h2><h3 id="生成推荐List"><a href="#生成推荐List" class="headerlink" title="生成推荐List"></a>生成推荐List</h3><blockquote>
 <p>前瞻：基于用户的协同过滤 生成推荐列表</p>
 </blockquote>
 <p>依赖关系图</p>
@@ -176,6 +176,72 @@
 </blockquote>
 <p>SlopeOneRecommender</p>
 <p>p20</p>
+<h1 id="第三章"><a href="#第三章" class="headerlink" title="第三章"></a>第三章</h1><h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><h3 id="表示偏好"><a href="#表示偏好" class="headerlink" title="表示偏好"></a>表示偏好</h3><h4 id="Preference接口"><a href="#Preference接口" class="headerlink" title="Preference接口"></a>Preference接口</h4><blockquote>
+<p>此接口的设计：<code>(userID,ItemID)=&gt;value</code> 来反映用户评分</p>
+</blockquote>
+<p>源代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Preference</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">getUserID</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">getItemID</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">getValue</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setValue</span><span class="params">(<span class="keyword">float</span> var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="GenericPreference类"><a href="#GenericPreference类" class="headerlink" title="GenericPreference类"></a>GenericPreference类</h4><blockquote>
+<p>实现了<code>Preference</code>接口</p>
+</blockquote>
+<p>用法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> GenericPreference(userID,itemID,<span class="number">4.7f</span>)</span><br></pre></td></tr></table></figure>
+<p>源代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenericPreference</span> <span class="keyword">implements</span> <span class="title">Preference</span>, <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> userID;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> itemID;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GenericPreference</span><span class="params">(<span class="keyword">long</span> userID, <span class="keyword">long</span> itemID, <span class="keyword">float</span> value)</span> </span>&#123;</span><br><span class="line">        Preconditions.checkArgument(!Float.isNaN(value), <span class="string">"NaN value"</span>);</span><br><span class="line">        <span class="keyword">this</span>.userID = userID;</span><br><span class="line">        <span class="keyword">this</span>.itemID = itemID;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getUserID</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.userID;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getItemID</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.itemID;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(<span class="keyword">float</span> value)</span> </span>&#123;</span><br><span class="line">        Preconditions.checkArgument(!Float.isNaN(value), <span class="string">"NaN value"</span>);</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"GenericPreference[userID: "</span> + <span class="keyword">this</span>.userID + <span class="string">", itemID:"</span> + <span class="keyword">this</span>.itemID + <span class="string">", value:"</span> + <span class="keyword">this</span>.value + <span class="string">']'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="表示复数偏好"><a href="#表示复数偏好" class="headerlink" title="表示复数偏好"></a>表示复数偏好</h3><h4 id="PreferenceArray接口"><a href="#PreferenceArray接口" class="headerlink" title="PreferenceArray接口"></a>PreferenceArray接口</h4><blockquote>
+<p>better:</p>
+<p>PreferenceArray比起java原生的Collections开销更少，原因：p22</p>
+</blockquote>
+<h4 id="GenericItemPreferenceArray-类"><a href="#GenericItemPreferenceArray-类" class="headerlink" title="GenericItemPreferenceArray 类"></a>GenericItemPreferenceArray 类</h4><blockquote>
+<p>实现了<code>PreferenceArray</code>接口</p>
+<p>用于记录某一<code>item</code>的所有<code>user</code>评分</p>
+</blockquote>
+<h4 id="GenericUserPreferenceArray-类"><a href="#GenericUserPreferenceArray-类" class="headerlink" title="GenericUserPreferenceArray 类"></a>GenericUserPreferenceArray 类</h4><blockquote>
+<p>实现了<code>PreferenceArray</code>接口</p>
+<p>用于记录某一<code>user</code>的所有<code>item</code>评分</p>
+</blockquote>
+<p>用法:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PreferenceArray user1Prefs = <span class="keyword">new</span> GenericUserPreferenceArray( <span class="number">2</span>);<span class="comment">//size为2的PreferenceArray</span></span><br><span class="line">user1Prefs. setUserID( <span class="number">0</span>, <span class="number">1L</span>);<span class="comment">//记录userId为1的偏好</span></span><br><span class="line"></span><br><span class="line">user1Prefs. setItemID( <span class="number">0</span>, <span class="number">101L</span>);</span><br><span class="line">user1Prefs. setValue( <span class="number">0</span>, <span class="number">2.0f</span>);</span><br><span class="line"></span><br><span class="line">user1Prefs. setItemID( <span class="number">1</span>, <span class="number">102L</span>);</span><br><span class="line">user1Prefs. setValue( <span class="number">0</span>, <span class="number">5.0f</span>);</span><br><span class="line"></span><br><span class="line">Preference preference = user1Prefs.get(<span class="number">0</span>);<span class="comment">//获取PreferenceArray下标为0的元素</span></span><br></pre></td></tr></table></figure>
+<p>性能优化升级表</p>
+<table>
+<thead>
+<tr>
+<th>java原生</th>
+<th>mahout</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TreeSet</td>
+<td>FastIDSet</td>
+</tr>
+<tr>
+<td>HashMap</td>
+<td>FastByIDMap</td>
+</tr>
+</tbody>
+</table>
+<p>p24</p>
+<blockquote>
+<p>设计理念：mahout基本都用long作为key值来减少开销</p>
+</blockquote>
+<h4 id="DataModel-接口"><a href="#DataModel-接口" class="headerlink" title="DataModel 接口"></a>DataModel 接口</h4><blockquote>
+<p>设计理念：</p>
+<p>为 各类 推荐 算法 提供 了 对 数据 的 高效 访问。 </p>
+<p>例如， DataModel 可以 提供 输入 数据 中 所有 用户 ID 的 计数 或 列表、 提供 与 某个 物品 相关 的 所有 偏好， 或 给出 所有 对 一组 物品 ID 表达 过 偏好 的 用户 的 个数。</p>
+</blockquote>
+<h4 id="GenericDataModel类"><a href="#GenericDataModel类" class="headerlink" title="GenericDataModel类"></a>GenericDataModel类</h4><blockquote>
+<p><code>DataModel</code>的一个简单实现，内存处理数据。</p>
+</blockquote>
+<p>代码 清单 3- 2 　 利用 GenericDataModel 在 程序 中 定义 输入 数据</p>
+<p>Sean Owen; Robin Anil; Ted Dunning; Ellen Friedman. Mahout实战 (图灵程序设计丛书) (p. 24). 人民邮电出版社. Kindle 版本. </p>
+<h4 id="FileDataModel类"><a href="#FileDataModel类" class="headerlink" title="FileDataModel类"></a>FileDataModel类</h4><blockquote>
+<p><code>DataModel</code>的一个实现类，可以从文件读取数据，支持<code>.csv`</code>.zip<code></code>.gz`文件。</p>
+</blockquote>
+<h3 id="运作原理"><a href="#运作原理" class="headerlink" title="运作原理"></a>运作原理</h3><p><img src="/images/读书笔记-mahout/数据结构-1.png" alt></p>
+<blockquote>
+<p>通常我们都用不到<code>GenericDataModel</code>等底层的类</p>
+</blockquote>
 </section>
     <!-- Tags START -->
     
@@ -257,7 +323,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#HelloWorldDemo"><span class="toc-nav-text">HelloWorldDemo</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#生成推荐List"><span class="toc-nav-text">生成推荐List</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分割训练集和测试集并评估算法误差"><span class="toc-nav-text">分割训练集和测试集并评估算法误差</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#评估误差方法表"><span class="toc-nav-text">评估误差方法表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#评估查准率和查全率"><span class="toc-nav-text">评估查准率和查全率</span></a></li></ol></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第二章：入门"><span class="toc-nav-text">第二章：入门</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#HelloWorldDemo"><span class="toc-nav-text">HelloWorldDemo</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#生成推荐List"><span class="toc-nav-text">生成推荐List</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分割训练集和测试集并评估算法误差"><span class="toc-nav-text">分割训练集和测试集并评估算法误差</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#评估误差方法表"><span class="toc-nav-text">评估误差方法表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#评估查准率和查全率"><span class="toc-nav-text">评估查准率和查全率</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第三章"><span class="toc-nav-text">第三章</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据结构"><span class="toc-nav-text">数据结构</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示偏好"><span class="toc-nav-text">表示偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Preference接口"><span class="toc-nav-text">Preference接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericPreference类"><span class="toc-nav-text">GenericPreference类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示复数偏好"><span class="toc-nav-text">表示复数偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#PreferenceArray接口"><span class="toc-nav-text">PreferenceArray接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericItemPreferenceArray-类"><span class="toc-nav-text">GenericItemPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericUserPreferenceArray-类"><span class="toc-nav-text">GenericUserPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#DataModel-接口"><span class="toc-nav-text">DataModel 接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericDataModel类"><span class="toc-nav-text">GenericDataModel类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FileDataModel类"><span class="toc-nav-text">FileDataModel类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运作原理"><span class="toc-nav-text">运作原理</span></a></li></ol></li></ol></li></ol>
     
   </div>
 </aside>

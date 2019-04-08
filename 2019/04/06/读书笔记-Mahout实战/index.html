@@ -242,7 +242,74 @@
 <blockquote>
 <p>通常我们都用不到<code>GenericDataModel</code>等底层的类</p>
 </blockquote>
-</section>
+<h3 id="数据刷新"><a href="#数据刷新" class="headerlink" title="数据刷新"></a>数据刷新</h3><p><img src="/images/读书笔记-mahout/数据刷新.png" alt></p>
+<blockquote>
+<p><code>FileDataModel</code> 仅 会在 被 请求 的 时候 才 从 底层 文件 重新 加载 数据。 出于 性能 考虑， 它不 会 自动检测 更新 或 定期 重新 加载 文件 的 内容。 </p>
+<p>如果希望所有依赖该数据的对象都被刷新。需要在Recommender中明确调用refresh() 的原因。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DataModel dataModel = <span class="keyword">new</span> FileDataModel( <span class="keyword">new</span> File(<span class="string">" input. csv"</span>); </span><br><span class="line">Recommender recommender = <span class="keyword">new</span> SlopeOneRecommender( dataModel); </span><br><span class="line">... </span><br><span class="line">recommender. refresh( <span class="keyword">null</span>);<span class="comment">//刷新DataModel,然后刷新自己</span></span><br></pre></td></tr></table></figure>
+<h3 id="保存额外更新"><a href="#保存额外更新" class="headerlink" title="保存额外更新"></a>保存额外更新</h3><blockquote>
+<p><code>FileDataModel</code> 支持更新文件。 它们就是在读取主数据文件之后额外生成的数据文件，并可以覆盖任何 以前 读取 的 数据。 通过 添加来形成新的偏好， 还可以更新现有偏好。 通过设一个偏好值为空的字符串来实现 删除。</p>
+<p>例如， 考虑 如下 的 更新 文件： </p>
+<p>1, 108, 3. 0 //更新userId为1的用户对itemId为108的偏好为3.0</p>
+<p>1, 103,//删除userId为1的用户对itemId为103的偏好</p>
+<p>这些 更新 文件 必须 和 主 数据 文件 在 同一个 目录 下， 且 文件名 的 前缀（ 第一个 域） 相同。 例如， 如果 主 数据 文件 为 foo. txt. gz， 更新 文件 可为 foo. 1. txt. gz 和 foo. 2. txt. gz。 它们 可以 是 压缩 文件。</p>
+</blockquote>
+<h4 id="JDBCDataModel接口"><a href="#JDBCDataModel接口" class="headerlink" title="JDBCDataModel接口"></a>JDBCDataModel接口</h4><ul>
+<li><p>JDBCDataModel继承自Datamodel</p>
+</li>
+<li><p>提供数据库连接；大部分子类面向MySql</p>
+</li>
+</ul>
+<p><strong>MySQL 中 taste_ preferences 表 默认 的 模式</strong></p>
+<table>
+<thead>
+<tr>
+<th>user_id</th>
+<th>item_id</th>
+<th>preference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bigint not null</td>
+<td>bigint not null</td>
+<td>float not null</td>
+</tr>
+<tr>
+<td>index</td>
+<td>index</td>
+<td></td>
+</tr>
+<tr>
+<td>primary key</td>
+<td>primary key</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<ol>
+<li><code>userId</code>和<code>itemId</code>必须<code>Not Null</code> 而且必须被索引</li>
+<li><code>primary key</code>必须为<code>userId</code>和<code>itemId</code>的组合</li>
+<li>long-&gt;bigint float-&gt;float</li>
+<li>注意调节缓冲区和查询高速缓存<code>(query cache)</code></li>
+<li>当使用mysql的<code>Connector/J</code>驱动时，将驱动的参数(如<code>cachePreparedStatements</code>设为<code>true</code>)</li>
+</ol>
+</blockquote>
+<p><strong>mysql建表语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> taste_ preferences (user_ <span class="keyword">id</span> <span class="built_in">BIGINT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>, item_ <span class="keyword">id</span> <span class="built_in">BIGINT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>, preference <span class="built_in">FLOAT</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>, PRIMARY <span class="keyword">KEY</span> (user_ <span class="keyword">id</span>, item_ <span class="keyword">id</span>), <span class="keyword">INDEX</span> (user_ <span class="keyword">id</span>), <span class="keyword">INDEX</span> (item_ <span class="keyword">id</span>))。</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MysqlDataSource dataSource = <span class="keyword">new</span> MysqlDataSource();</span><br><span class="line">	dataSource.setServerName(<span class="string">"my_database_host"</span>);</span><br><span class="line">    dataSource. setUser(<span class="string">"my_user"</span>);</span><br><span class="line">    dataSource. setPassword(<span class="string">"my_password"</span>);</span><br><span class="line">    dataSource. setDatabaseName(<span class="string">"my_database_name"</span>);</span><br><span class="line">JDBCDataModel dataModel1 = <span class="keyword">new</span> MySQLJDBCDataModel(dataSource);</span><br></pre></td></tr></table></figure>
+<h2 id="无偏好数据"><a href="#无偏好数据" class="headerlink" title="无偏好数据"></a>无偏好数据</h2><p>有时， 输入 推荐 引擎 的 偏好 没有 值。 也就是说， 用户 和 物品 是 关联 的， 但是 没有 这种 关联 的 强度 描述。 例如， 一个 新闻 网 站 要 根据 用户 以前 浏览 的 新闻 文章 做 推荐， 但 只 知道 一些 用户 和 物品 之间 的 关联， 而 没有 更多 的 信息， 因为 用户 通常 不会 去 评价 文章。 用户 在 浏览 文章 之外 甚至 都 很少 会 去做 其他 的 事情。 这时， 我们 仅能 得知 与 用户 关联 的 是 哪 篇 文章， 以及 少量 的 其他 信息。在这里， 我们 别无选择； 在 输入 中 没有 偏好 值 可以 作为 初始 值。 即便 在 输入 中的 确 存在 偏好 值， 有时 忽略 它们 也会 有 好处。 至少 在 有的 时候， 这样做 没有 坏处。</p>
+<p>用户 1 对 电影 103 表达 的 偏好 为 4. 5 =&gt; 忘记 4. 5 这个 值=&gt; 用户 1 和 电影 103 有 关联</p>
+<p><img src="/images/读书笔记-mahout/无偏好数据.png" alt></p>
+<blockquote>
+<p>在 Mahout 的 语言 里， 这种 没有 偏好 值 的 关联 称为 布尔 型 偏好（ Boolean preference）， 因为 一个 关联 只可 能有 两个 值： 存在 或不 存在。 这 并不 意味着 数据 中的 物品 偏好 是 yes 或 no， 而是 会 让 用户- 物品 关联 具有 全部 的 三种 可能 状态： 喜欢、 不喜欢 或 无所谓。</p>
+</blockquote>
+<h4 id="GenericBooleanPrefDataModel"><a href="#GenericBooleanPrefDataModel" class="headerlink" title="GenericBooleanPrefDataModel"></a>GenericBooleanPrefDataModel</h4><p>这是另一个内存级的DataModel 实现，但其内部并不存储偏好值。 它简单地将关联存为FastIDSet;例如,每个用户 用 1 个，来代表与用户关联的所有物品ID。其中不包含偏好值。</p>
+<p><code>getItemIDsForUser()</code>方法会变快</p>
+<p><code>getPreferencesFromUser()</code>方法会变慢</p>
+<p><code>getPreferenceValue()</code> 会引发一些问题。依赖于偏好值的组件会出错。如皮尔逊相似度和距离计算</p>
+<h4 id="GenericBooleanPrefUserBasedRecommender"><a href="#GenericBooleanPrefUserBasedRecommender" class="headerlink" title="GenericBooleanPrefUserBasedRecommender"></a>GenericBooleanPrefUserBasedRecommender</h4></section>
     <!-- Tags START -->
     
       <div class="tags">
@@ -276,7 +343,7 @@
       </a>
     
     
-      <a class="nav-right" href="/2019/04/07/hello-world/">
+      <a class="nav-right" href="/2019/04/08/hello-world/">
         
           Hello World
         
@@ -325,7 +392,7 @@
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第二章：入门"><span class="toc-nav-text">第二章：入门</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#HelloWorldDemo"><span class="toc-nav-text">HelloWorldDemo</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#生成推荐List"><span class="toc-nav-text">生成推荐List</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分割训练集和测试集并评估算法误差a"><span class="toc-nav-text">分割训练集和测试集并评估算法误差a</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#评估误差方法表"><span class="toc-nav-text">评估误差方法表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#评估查准率和查全率"><span class="toc-nav-text">评估查准率和查全率</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第三章"><span class="toc-nav-text">第三章</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据结构"><span class="toc-nav-text">数据结构</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示偏好"><span class="toc-nav-text">表示偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Preference接口"><span class="toc-nav-text">Preference接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericPreference类"><span class="toc-nav-text">GenericPreference类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示复数偏好"><span class="toc-nav-text">表示复数偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#PreferenceArray接口"><span class="toc-nav-text">PreferenceArray接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericItemPreferenceArray-类"><span class="toc-nav-text">GenericItemPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericUserPreferenceArray-类"><span class="toc-nav-text">GenericUserPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#DataModel-接口"><span class="toc-nav-text">DataModel 接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericDataModel类"><span class="toc-nav-text">GenericDataModel类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FileDataModel类"><span class="toc-nav-text">FileDataModel类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运作原理"><span class="toc-nav-text">运作原理</span></a></li></ol></li></ol></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第二章：入门"><span class="toc-nav-text">第二章：入门</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#HelloWorldDemo"><span class="toc-nav-text">HelloWorldDemo</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#生成推荐List"><span class="toc-nav-text">生成推荐List</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#分割训练集和测试集并评估算法误差a"><span class="toc-nav-text">分割训练集和测试集并评估算法误差a</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#评估误差方法表"><span class="toc-nav-text">评估误差方法表</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#评估查准率和查全率"><span class="toc-nav-text">评估查准率和查全率</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#第三章"><span class="toc-nav-text">第三章</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#数据结构"><span class="toc-nav-text">数据结构</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示偏好"><span class="toc-nav-text">表示偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Preference接口"><span class="toc-nav-text">Preference接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericPreference类"><span class="toc-nav-text">GenericPreference类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#表示复数偏好"><span class="toc-nav-text">表示复数偏好</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#PreferenceArray接口"><span class="toc-nav-text">PreferenceArray接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericItemPreferenceArray-类"><span class="toc-nav-text">GenericItemPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericUserPreferenceArray-类"><span class="toc-nav-text">GenericUserPreferenceArray 类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#DataModel-接口"><span class="toc-nav-text">DataModel 接口</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericDataModel类"><span class="toc-nav-text">GenericDataModel类</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#FileDataModel类"><span class="toc-nav-text">FileDataModel类</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#运作原理"><span class="toc-nav-text">运作原理</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#数据刷新"><span class="toc-nav-text">数据刷新</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#保存额外更新"><span class="toc-nav-text">保存额外更新</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#JDBCDataModel接口"><span class="toc-nav-text">JDBCDataModel接口</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#无偏好数据"><span class="toc-nav-text">无偏好数据</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericBooleanPrefDataModel"><span class="toc-nav-text">GenericBooleanPrefDataModel</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#GenericBooleanPrefUserBasedRecommender"><span class="toc-nav-text">GenericBooleanPrefUserBasedRecommender</span></a></li></ol></li></ol></li></ol>
     
   </div>
 </aside>
